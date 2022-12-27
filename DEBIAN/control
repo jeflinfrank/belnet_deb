@@ -1,0 +1,19 @@
+Package: belnet
+Version: 0.9.5~ubuntu2004
+Architecture: all
+Maintainer: Sanada Yukumira <sanada.yukumira@beldex.io>
+Installed-Size: 89
+Depends: belnet-bin (= 0.9.6.1~ubuntu2004), adduser, ucf
+Recommends: resolvconf
+Section: net
+Priority: optional
+Homepage: https://belnet.org/
+Description: belnet anonymous, decentralized overlay network - client service
+ Belnet private, decentralized, market-based, Sybil resistant overlay network
+ for the internet.
+ .
+ This package contains contains the configuration needed to run belnet as a
+ system service to allow the local system to access belnet either as an
+ anonymous client or as a belnet "mnapp".
+ .
+ Most users looking to access belnet want to install this package.

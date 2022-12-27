@@ -1,0 +1,93 @@
+#!/bin/sh -e
+
+set -e
+
+if [ "$1" = configure ]; then
+    mkdir -p /etc/beldex
+    datadir=/var/lib/belnet
+    tn_datadir=/var/lib/belnet/testnet
+    mkdir -p $datadir $tn_datadir
+    su -s /bin/sh _belnet -c "test -O $datadir && test -G $datadir" || \
+        chown _belnet:_beldex $datadir
+    su -s /bin/sh _belnet -c "test -O $tn_datadir && test -G $tn_datadir" || \
+        chown _belnet:_beldex $tn_datadir
+
+    tmpdir=$(mktemp --tmpdir -d belnet.XXXXXXXXXX)
+    /usr/bin/belnet -g $tmpdir/belnet.ini
+    sed -i -e "s#$tmpdir#$datadir#" $tmpdir/belnet.ini
+    chmod 640 $tmpdir/belnet.ini
+    chgrp _beldex $tmpdir/belnet.ini
+    ucf $tmpdir/belnet.ini /etc/beldex/belnet.ini
+    ucfr belnet /etc/beldex/belnet.ini
+
+    tmpdir=$(mktemp --tmpdir -d belnet.XXXXXXXXXX)
+    /usr/bin/belnet -g $tmpdir/belnet.ini
+    sed -i -e "s#$tmpdir#$tn_datadir#" $tmpdir/belnet.ini
+    chmod 640 $tmpdir/belnet.ini
+    chgrp _beldex $tmpdir/belnet.ini
+    ucf $tmpdir/belnet.ini /etc/beldex/belnet-testnet.ini
+    ucfr belnet /etc/beldex/belnet-testnet.ini
+
+    if [ -x /bin/systemctl ] && /bin/systemctl --quiet is-active systemd-resolved.service; then
+        /bin/systemctl restart systemd-resolved.service
+    fi
+fi
+
+# Automatically added by dh_installsystemd/12.10ubuntu1
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	# This will only remove masks created by d-s-h on package removal.
+	deb-systemd-helper unmask 'belnet.service' >/dev/null || true
+
+	# was-enabled defaults to true, so new installations run enable.
+	if deb-systemd-helper --quiet was-enabled 'belnet.service'; then
+		# Enables the unit on first installation, creates new
+		# symlinks on upgrades if the unit file has changed.
+		deb-systemd-helper enable 'belnet.service' >/dev/null || true
+	else
+		# Update the statefile to add new symlinks (if any), which need to be
+		# cleaned up on purge. Also remove old symlinks.
+		deb-systemd-helper update-state 'belnet.service' >/dev/null || true
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_installsystemd/12.10ubuntu1
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -d /run/systemd/system ]; then
+		systemctl --system daemon-reload >/dev/null || true
+		if [ -n "$2" ]; then
+			_dh_action=restart
+		else
+			_dh_action=start
+		fi
+		deb-systemd-invoke $_dh_action 'belnet.service' >/dev/null || true
+	fi
+fi
+# End automatically added section
+# Automatically added by dh_installsystemd/12.10ubuntu1
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if deb-systemd-helper debian-installed 'belnet-testnet.service'; then
+		# This will only remove masks created by d-s-h on package removal.
+		deb-systemd-helper unmask 'belnet-testnet.service' >/dev/null || true
+
+		if deb-systemd-helper --quiet was-enabled 'belnet-testnet.service'; then
+			# Create new symlinks, if any.
+			deb-systemd-helper enable 'belnet-testnet.service' >/dev/null || true
+		fi
+	fi
+
+	# Update the statefile to add new symlinks (if any), which need to be cleaned
+	# up on purge. Also remove old symlinks.
+	deb-systemd-helper update-state 'belnet-testnet.service' >/dev/null || true
+fi
+# End automatically added section
+# Automatically added by dh_installsystemd/12.10ubuntu1
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -d /run/systemd/system ]; then
+		systemctl --system daemon-reload >/dev/null || true
+		if [ -n "$2" ]; then
+			deb-systemd-invoke try-restart 'belnet-testnet.service' >/dev/null || true
+		fi
+	fi
+fi
+# End automatically added section
+

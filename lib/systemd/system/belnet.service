@@ -1,0 +1,21 @@
+[Unit]
+Description=BelNET: Anonymous Network layer thingydoo, client
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=_belnet
+Type=simple
+SyslogIdentifier=belnet
+WorkingDirectory=/var/lib/belnet
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+ExecStart=/usr/bin/belnet /var/lib/belnet/belnet.ini
+ExecStartPost=+/usr/sbin/belnet-resolvconf add /var/lib/belnet/belnet.ini
+ExecStopPost=+/usr/sbin/belnet-resolvconf remove /var/lib/belnet/belnet.ini
+Environment=BELNET_NETID=belnet
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

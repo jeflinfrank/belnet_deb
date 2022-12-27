@@ -1,0 +1,7 @@
+40bd8a2062a50553c51e758b16e7d47c  lib/systemd/system/belnet-testnet.service
+4ec4a54290857cb590d236d91840e03c  lib/systemd/system/belnet.service
+1bb31ae02224aedbf3f30e93e145aae1  usr/sbin/belnet-resolvconf
+9bfc9b82bab320e62e25816538d2eee5  usr/share/doc/belnet/changelog.Debian.gz
+0829b89923f1a90271e62186449ba106  usr/share/doc/belnet/copyright
+15066c1dc17b52e37adea10dc331bcf3  usr/share/polkit-1/rules.d/belnet.rules
+3ace6989590dcbbd1c525cb126ce4deb  var/lib/polkit-1/localauthority/10-vendor.d/belnet.pkla
